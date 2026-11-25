@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background: #050505;
+  }
+  ::selection {
+    background: #e11d2e;
+    color: #fff;
+  }
+  * {
+    scrollbar-color: #3a3a3a #0a0a0a;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-8;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold uppercase tracking-wider transition duration-200 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply btn bg-brand text-white hover:bg-brand-light;
+  }
+  .btn-ghost {
+    @apply btn border border-white/20 text-white hover:border-brand hover:text-brand;
+  }
+  .btn-danger {
+    @apply btn border border-red-500/40 text-red-400 hover:bg-red-500/10;
+  }
+  .btn-sm {
+    @apply px-4 py-2 text-xs;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-white/10 bg-ink-900 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-brand focus:ring-1 focus:ring-brand;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wider text-zinc-400;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.3em] text-brand;
+  }
+  .section-title {
+    @apply font-display text-5xl uppercase leading-[0.95] text-white sm:text-6xl md:text-7xl;
+  }
+  .card {
+    @apply rounded-xl border border-white/10 bg-ink-800;
+  }
+}
+
+@layer utilities {
+  /* Timeline-ruler tick marks, a nod to the editing workspace. */
+  .ruler {
+    height: 10px;
+    background-image: repeating-linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.18) 0,
+      rgba(255, 255, 255, 0.18) 1px,
+      transparent 1px,
+      transparent 14px
+    );
+  }
+}

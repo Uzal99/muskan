@@ -1,0 +1,101 @@
+generator client {
+  provider      = "prisma-client-js"
+  // rhel-openssl-3.0.x is the runtime used by Netlify Functions (AWS Lambda).
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // pooled (pgbouncer) — runtime
+  directUrl = env("DIRECT_URL") // session/direct — schema changes
+}
+
+/// Single row (id = 1) holding every editable piece of site-wide content.
+model SiteSettings {
+  id                Int      @id @default(1)
+  siteName          String
+  tagline           String
+  heroEyebrow       String
+  heroTitle         String
+  heroSubtitle      String
+  heroVideoUrl      String?
+  showreelUrl       String?
+  aboutTitle        String
+  aboutBody         String   @db.Text
+  aboutImage        String?
+  tools             String[]
+  yearsExperience   Int
+  projectsDelivered Int
+  happyClients      Int
+  contactTitle      String
+  contactSubtitle   String
+  email             String?
+  phone             String?
+  location          String?
+  instagram         String?
+  youtube           String?
+  vimeo             String?
+  linkedin          String?
+  twitter           String?
+  seoTitle          String
+  seoDescription    String
+  ogImage           String?
+  updatedAt         DateTime @updatedAt
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  category    String   @default("")
+  client      String?
+  year        Int?
+  summary     String   @default("")
+  description String   @default("") @db.Text
+  thumbnail   String?
+  videoUrl    String?
+  featured    Boolean  @default(false)
+  published   Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published, sortOrder])
+}
+
+model Service {
+  id          String @id @default(cuid())
+  title       String
+  description String @default("") @db.Text
+  icon        String @default("film")
+  sortOrder   Int    @default(0)
+}
+
+model Testimonial {
+  id        String  @id @default(cuid())
+  name      String
+  role      String?
+  quote     String  @db.Text
+  avatar    String?
+  published Boolean @default(true)
+  sortOrder Int     @default(0)
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  body      String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
