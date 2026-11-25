@@ -2,7 +2,12 @@
 
 import { randomUUID } from "node:crypto";
 import { requireAdmin } from "@/lib/auth";
-import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_BYTES } from "@/lib/constants";
+import {
+  ALLOWED_IMAGE_TYPES,
+  ALLOWED_VIDEO_TYPES,
+  MAX_IMAGE_BYTES,
+  MAX_VIDEO_BYTES,
+} from "@/lib/constants";
 import { BUCKET, getSupabaseAdmin } from "@/lib/supabase";
 
 export type UploadUrlResult =
@@ -21,10 +26,15 @@ export async function createUploadUrl(input: {
 }): Promise<UploadUrlResult> {
   await requireAdmin();
 
-  const ext = ALLOWED_IMAGE_TYPES[input.contentType];
-  if (!ext) return { ok: false, error: "Use a JPG, PNG, WebP, GIF or AVIF image." };
-  if (!Number.isFinite(input.size) || input.size <= 0 || input.size > MAX_IMAGE_BYTES) {
-    return { ok: false, error: "Image must be 5 MB or smaller." };
+  const imageExt = ALLOWED_IMAGE_TYPES[input.contentType];
+  const videoExt = ALLOWED_VIDEO_TYPES[input.contentType];
+  const ext = imageExt ?? videoExt;
+  if (!ext) return { ok: false, error: "Unsupported file type." };
+  const maxBytes = imageExt ? MAX_IMAGE_BYTES : MAX_VIDEO_BYTES;
+  const fileLabel = imageExt ? "Image" : "Video";
+  const maxMegabytes = imageExt ? 5 : 50;
+  if (!Number.isFinite(input.size) || input.size <= 0 || input.size > maxBytes) {
+    return { ok: false, error: `${fileLabel} must be ${maxMegabytes} MB or smaller.` };
   }
 
   const supabase = getSupabaseAdmin();

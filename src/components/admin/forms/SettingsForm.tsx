@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { saveSettings } from "@/actions/settings";
 import { initialState } from "@/lib/types";
 import ImageUpload from "../ImageUpload";
+import VideoUpload from "../VideoUpload";
 import { Field, Notice, Section, SubmitButton } from "../ui";
 
 export default function SettingsForm({ settings: s }: { settings: SiteSettings }) {
@@ -37,9 +38,12 @@ export default function SettingsForm({ settings: s }: { settings: SiteSettings }
           <Field label="Showreel link" hint="YouTube, Vimeo or direct .mp4 link. Adds a “Watch showreel” button.">
             <input name="showreelUrl" type="url" defaultValue={s.showreelUrl ?? ""} placeholder="https://youtu.be/…" className="input" />
           </Field>
-          <Field label="Background loop (optional)" hint="Direct .mp4/.webm link, muted and looping behind the headline.">
-            <input name="heroVideoUrl" type="url" defaultValue={s.heroVideoUrl ?? ""} placeholder="https://…/loop.mp4" className="input" />
-          </Field>
+          <VideoUpload
+            name="heroVideoUrl"
+            label="Background loop (optional)"
+            defaultValue={s.heroVideoUrl}
+            hint="Upload an MP4/WebM to Supabase Storage or paste a public video URL. Loops muted behind the headline. Max 50 MB."
+          />
         </div>
       </Section>
 

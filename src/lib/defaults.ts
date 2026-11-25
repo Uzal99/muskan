@@ -7,7 +7,7 @@ import type { SiteSettings } from "@prisma/client";
  */
 export const DEFAULT_SETTINGS: SiteSettings = {
   id: 1,
-  siteName: "ALEX MORGAN",
+  siteName: "Muskan Rai",
   tagline: "Video Editor & Colorist",
   heroEyebrow: "Available for new projects",
   heroTitle: "I cut stories that *hit.*",
@@ -41,9 +41,9 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   vimeo: null,
   linkedin: null,
   twitter: null,
-  seoTitle: "Alex Morgan — Video Editor & Colorist",
+  seoTitle: "Muskan Rai — Video Editor & Colorist",
   seoDescription:
-    "Portfolio of Alex Morgan, a professional video editor and colorist. Commercials, music videos, documentaries and social content.",
+    "Portfolio of Muskan Rai, a professional video editor and colorist. Commercials, music videos, documentaries and social content.",
   ogImage: null,
   updatedAt: new Date(0),
 };
