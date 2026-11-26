@@ -44,7 +44,7 @@ export default function ProjectForm({ project }: { project?: Project }) {
       </Section>
 
       <Section title="Media">
-        <Field label="Video link" hint="YouTube, Vimeo or direct .mp4/.webm link. YouTube links also provide the thumbnail automatically.">
+        <Field label="Video link" hint="YouTube, Vimeo or direct .mp4/.webm links embed here. Other HTTPS social video links open on their platform. YouTube links also provide the thumbnail automatically.">
           <input name="videoUrl" type="url" defaultValue={project?.videoUrl ?? ""} placeholder="https://youtu.be/…" className="input" />
         </Field>
         <ImageUpload

@@ -7,7 +7,7 @@ import { requireAdmin } from "@/lib/auth";
 import { firstError, getBool, getInt, getNullable, getStr } from "@/lib/form";
 import { revalidateSite } from "@/lib/revalidate";
 import { slugify } from "@/lib/utils";
-import { parseVideoUrl } from "@/lib/video";
+import { isHttpsUrl, parseVideoUrl } from "@/lib/video";
 import type { ActionState } from "@/lib/types";
 
 const urlMsg = "Enter a full URL starting with https://";
@@ -55,8 +55,8 @@ export async function saveProject(_prev: ActionState, fd: FormData): Promise<Act
   if (!parsed.success) return { ok: false, error: firstError(parsed.error) };
   const data = parsed.data;
 
-  if (data.videoUrl && !parseVideoUrl(data.videoUrl)) {
-    return { ok: false, error: "Video must be a YouTube, Vimeo or direct .mp4/.webm link." };
+  if (data.videoUrl && !parseVideoUrl(data.videoUrl) && !isHttpsUrl(data.videoUrl)) {
+    return { ok: false, error: "Unsupported video links must use HTTPS." };
   }
 
   const clash = await prisma.project.findUnique({ where: { slug: data.slug } });

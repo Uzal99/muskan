@@ -5,6 +5,15 @@ export type VideoInfo = {
   thumbnail: string | null;
 };
 
+export function isHttpsUrl(raw?: string | null): raw is string {
+  if (!raw) return false;
+  try {
+    return new URL(raw).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Understands YouTube, Vimeo and direct video-file links
  * (.mp4 / .webm / .mov / .m4v). Returns null for anything else.

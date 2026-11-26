@@ -5,7 +5,7 @@ import ProjectCardLink from "@/components/site/ProjectCardLink";
 import VideoEmbed from "@/components/site/VideoEmbed";
 import { getProjectBySlug, getPublishedProjects, projectThumb, toCard } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
-import { parseVideoUrl } from "@/lib/video";
+import { isHttpsUrl, parseVideoUrl } from "@/lib/video";
 
 export const revalidate = 300;
 
@@ -69,6 +69,17 @@ export default async function ProjectPage({ params }: Props) {
         <div className="mt-10">
           {video ? (
             <VideoEmbed video={video} title={project.title} />
+          ) : isHttpsUrl(project.videoUrl) ? (
+            <div className="grid aspect-video w-full place-items-center rounded-xl border border-white/10 bg-[radial-gradient(circle_at_30%_20%,rgba(225,29,46,0.3),transparent_60%),#0d0d0d]">
+              <a
+                href={project.videoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary"
+              >
+                Watch video on social media ↗
+              </a>
+            </div>
           ) : thumb ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={thumb} alt={project.title} className="aspect-video w-full rounded-xl border border-white/10 object-cover" />
