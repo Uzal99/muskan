@@ -1,5 +1,5 @@
 export type VideoInfo = {
-  provider: "youtube" | "vimeo" | "file";
+  provider: "youtube" | "vimeo" | "file" | "instagram" | "tiktok" | "facebook" | "x";
   url: string;
   embedUrl: string;
   thumbnail: string | null;
@@ -15,8 +15,9 @@ export function isHttpsUrl(raw?: string | null): raw is string {
 }
 
 /**
- * Understands YouTube, Vimeo and direct video-file links
- * (.mp4 / .webm / .mov / .m4v). Returns null for anything else.
+ * Understands common video links from YouTube, Vimeo, Instagram, TikTok,
+ * Facebook and X, plus direct video files (.mp4 / .webm / .mov / .m4v).
+ * Returns null for links that cannot be embedded safely.
  */
 export function parseVideoUrl(raw?: string | null): VideoInfo | null {
   if (!raw) return null;
@@ -51,6 +52,60 @@ export function parseVideoUrl(raw?: string | null): VideoInfo | null {
     };
   }
 
+  // ── Instagram posts and reels ──
+  if (host === "instagram.com" || host === "m.instagram.com") {
+    const match = u.pathname.match(/^\/(p|reel|tv)\/([a-z0-9_-]+)\/?$/i);
+    if (match) {
+      return {
+        provider: "instagram",
+        url: input,
+        embedUrl: `https://www.instagram.com/${match[1]}/${match[2]}/embed/`,
+        thumbnail: null,
+      };
+    }
+  }
+
+  // ── TikTok videos ──
+  if (host === "tiktok.com" || host === "m.tiktok.com") {
+    const match = u.pathname.match(/^\/@[^/]+\/video\/(\d+)\/?$/i);
+    if (match) {
+      const embed = new URL(`https://www.tiktok.com/player/v1/${match[1]}`);
+      embed.searchParams.set("music_info", "1");
+      embed.searchParams.set("description", "1");
+      return { provider: "tiktok", url: input, embedUrl: embed.toString(), thumbnail: null };
+    }
+  }
+
+  // ── Facebook videos, reels and watch links ──
+  if (
+    host === "facebook.com" ||
+    host.endsWith(".facebook.com") ||
+    host === "fb.watch"
+  ) {
+    const isVideoPath =
+      /^\/watch\/?$/i.test(u.pathname) ||
+      /\/(videos?|reel|posts|share\/v)\//i.test(u.pathname);
+    if (isVideoPath || host === "fb.watch") {
+      const embed = new URL("https://www.facebook.com/plugins/video.php");
+      embed.searchParams.set("href", input);
+      embed.searchParams.set("show_text", "false");
+      embed.searchParams.set("width", "640");
+      return { provider: "facebook", url: input, embedUrl: embed.toString(), thumbnail: null };
+    }
+  }
+
+  // ── X / Twitter video posts ──
+  if (host === "x.com" || host.endsWith(".x.com") || host === "twitter.com" || host.endsWith(".twitter.com")) {
+    const match = u.pathname.match(/\/status\/(\d+)\/?$/i);
+    if (match) {
+      const embed = new URL("https://platform.twitter.com/embed/Tweet.html");
+      embed.searchParams.set("id", match[1]);
+      embed.searchParams.set("theme", "dark");
+      embed.searchParams.set("dnt", "true");
+      return { provider: "x", url: input, embedUrl: embed.toString(), thumbnail: null };
+    }
+  }
+
   // ── Vimeo ──
   if (host === "vimeo.com" || host === "player.vimeo.com") {
     const parts = u.pathname.split("/").filter(Boolean);
@@ -78,6 +133,8 @@ export function parseVideoUrl(raw?: string | null): VideoInfo | null {
 export function embedSrc(video: VideoInfo, autoplay = false): string {
   if (video.provider === "file") return video.embedUrl;
   const u = new URL(video.embedUrl);
-  if (autoplay) u.searchParams.set("autoplay", "1");
+  if (autoplay && (video.provider === "youtube" || video.provider === "vimeo")) {
+    u.searchParams.set("autoplay", "1");
+  }
   return u.toString();
 }
